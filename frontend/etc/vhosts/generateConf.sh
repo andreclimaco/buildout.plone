@@ -1,5 +1,5 @@
 #!/bin/bash
-#./generateConf.sh portal Plone
+#./generateConf.sh hostname idPloneSite
 
 TEMPLATE="../templates/portal.conf.in"
 VAR_PORTALID=$1
