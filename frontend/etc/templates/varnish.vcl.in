@@ -1,6 +1,6 @@
 # Include list of backends and portal
 #include "${buildout:directory}/etc/varnish/backends.vcl";
-include "${buildout:directory}/etc/varnish/vhosts.vcl";
+#include "${buildout:directory}/etc/varnish/vhosts.vcl";
 
 backend default {
     .host = "${varnish-config:backend-host}";
