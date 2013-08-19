@@ -1,7 +1,7 @@
 #!/bin/bash
 #./generateConf.sh portal
 
-TEMPLATE="../templates/portal.jus.br.conf.in"
+TEMPLATE="../templates/portal.conf.in"
 VAR_PORTALID=$1
 VAR_MIRROR_NGINX="../../var/www/$VAR_PORTALID/mirror"
 VAR_TMP_NGINX="../../var/www/$VAR_PORTALID/tmp"
