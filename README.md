@@ -1,3 +1,9 @@
 # Buildout Plone
 
-# Pré-requisitos
+# Preparação do ambiente
+
+# Zeo
+
+# Zeo Client
+
+# Frontend
