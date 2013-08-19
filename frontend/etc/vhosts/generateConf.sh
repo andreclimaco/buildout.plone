@@ -8,11 +8,11 @@ VAR_TMP_NGINX="../../var/www/$VAR_PORTALID/tmp"
 
 if [ $1 ]; then
     if [ -f $TEMPLATE ]; then
-        if [ -f ./$VAR_PORTALID.jus.br.conf ]; then
-            echo "O arquivo $VAR_PORTALID.jus.br.conf já existe.";
+        if [ -f ./$VAR_PORTALID.conf ]; then
+            echo "O arquivo $VAR_PORTALID.conf já existe.";
         else
-            cat $TEMPLATE | sed -e s/VAR_PORTALID/$VAR_PORTALID/g | tee ./$VAR_PORTALID.jus.br.conf 1>/dev/null;
-            echo "O arquivo $VAR_PORTALID.jus.br.conf foi criado com sucesso!";
+            cat $TEMPLATE | sed -e s/VAR_PORTALID/$VAR_PORTALID/g | tee ./$VAR_PORTALID.conf 1>/dev/null;
+            echo "O arquivo $VAR_PORTALID.conf foi criado com sucesso!";
             if [ ! -d $VAR_MIRROR_NGINX ]; then
                 mkdir -p $VAR_MIRROR_NGINX;
                 echo "Criando o diretório MIRROR em: $VAR_MIRROR_NGINX";
