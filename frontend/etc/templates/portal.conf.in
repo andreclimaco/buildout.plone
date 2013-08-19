@@ -1,0 +1,54 @@
+server {
+    listen       80;
+    server_name VAR_PORTALID;
+
+    access_log ${buildout:directory}/var/log/access.VAR_PORTALID.log main;
+
+    #Descarta requisicoes contendo ".."
+    if ($uri ~ ".*\.\..*"){
+        return 404;
+    }
+
+    #Descarta requisicoes para conteudo de aplicacoes
+    if ($uri ~ ".*\.(jsp|do|php|dll|asp)$"){
+        return 404;
+    }
+
+    location /temas/ {
+        root ${buildout:directory};
+        expires 2d;
+    }
+
+    # Get content from Varnish
+    location @fetch {
+        root ${buildout:directory}/var/www/VAR_PORTALID/mirror;        
+        internal;
+        proxy_pass http://varnish;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Host $http_host;
+        proxy_pass_header Set-Cookie;
+        proxy_store on;
+        proxy_store_access user:rw  group:rw  all:r;
+        proxy_temp_path ${buildout:directory}/var/www/VAR_PORTALID/tmp;
+    }
+    
+    # Resource Registries will be cached in disk
+    location ~ ^/portal_(kss|css|javascripts)/  {
+        root  ${buildout:directory}/var/www/VAR_PORTALID/mirror;
+        expires                 30d;
+        add_header              Cache-Control public;
+        access_log              off;
+        allow all;
+        error_page 404 = @fetch;
+    }
+
+    location / {
+        include ${buildout:directory}/etc/proxy.conf;
+        proxy_pass http://varnish;
+    }
+
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   html;
+    }
+}
