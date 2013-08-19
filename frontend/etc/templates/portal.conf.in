@@ -14,11 +14,6 @@ server {
         return 404;
     }
 
-    location / {
-        include ../proxy.conf;
-        proxy_pass http://0.0.0.0:8010/VirtualHostBase/http/VAR_PORTALID:80/VAR_PLONE_SITE_ID/VirtualHostRoot/;
-    }
-
     location /temas/ {
         root ../..;
         expires 2d;
@@ -49,7 +44,7 @@ server {
 
     location / {
         include ../../etc/proxy.conf;
-        proxy_pass http://varnish;
+        proxy_pass http://0.0.0.0:8010/VirtualHostBase/http/VAR_PORTALID:80/VAR_PLONE_SITE_ID/VirtualHostRoot/;
     }
 
     error_page   500 502 503 504  /50x.html;
