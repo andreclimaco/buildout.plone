@@ -1,6 +1,6 @@
 # Include list of backends and portal
 #include "${buildout:directory}/etc/varnish/backends.vcl";
-#include "${buildout:directory}/etc/varnish/vhosts.vcl";
+include "${buildout:directory}/etc/varnish/vhosts.vcl";
 
 backend default {
     .host = "${varnish-config:backend-host}";
@@ -44,7 +44,7 @@ sub vcl_recv {
     call normalize_url;
 
     # Multiple hostnames
-    # call process_vhosts;
+    call process_vhosts;
 
     # Deal with PURGES and BANS
     if (req.request == "PURGE") {
