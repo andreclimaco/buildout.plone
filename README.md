@@ -131,4 +131,10 @@ $ ./bin/supervisord
 $ ./bin/supervisorctl status
 
 ```
+Powered:
 
+André Clímaco
+
+Sponsored by 
+
+[<img src="http://lucasaquino.com.br/logo.png" width="200"  />](http://www.lucasaquino.com.br)
