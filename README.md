@@ -20,7 +20,7 @@ Preparando as configurações antes de rodar o buildout:
 $ cd /path/to/zeo
 $ vim settings.cfg
 
-No arquivo alterar as variáveis:
+No arquivo, alterar as variáveis:
 
 [blobstorage]
 directory = /path/to/blobstorage
@@ -41,7 +41,7 @@ Preparando as configurações antes de rodar o buildout:
 $ cd /path/to/app
 $ vim settings.cfg
 
-No arquivo alterar as variáveis:
+No arquivo, alterar as variáveis:
 
 [users]
 effective-user = user/local/machine
@@ -61,6 +61,26 @@ $ bin/buildout -v
 ```
 
 ## Frontend
+Preparando as configurações antes de rodar o buildout:
+```bash
+$ cd /path/to/frontend
+$ vim settings.cfg
+
+No arquivo, alterar as variáveis:
+
+[users]
+os = user/local/machine
+
+[hostname]
+portal = hostname/machine/instance
+
+[varnish-purge-hosts]
+hosts =
+"hostname/machine/instance";
+
+```
+Executar o buildout:
+
 ```bash
 $ cd /path/to/frontend
 $ python bootstrap.py
