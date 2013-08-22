@@ -1,5 +1,16 @@
 # Buildout Plone
 
+A configuração proposta, a seguir, é destinada a aumentar o desempenho de um ambiente de produção para o Plone. 
+
+Para aumentar o desempenho, devemos atingir alguns objetivos:
+
+* O navegador web do usuário deverá armazenar a maior quantidade de informações em cache possível.  
+* O servidor de cache (Varnish) deverá otimizar o armazenamento das informações do backend.
+* Automatizar a atualização do conteúdo em cache (Varnish).
+* Balanceamneto de carga entra as instâncias, para evitar sobrecarga.
+* Acesso diferenciado para usuários autenticados e anônimos.
+* Os serviços serão gerenciados(start|stop|restart) pelo Supervisor.
+
 <img src="https://raw.github.com/andreclimaco/buildout.plone/master/docs/configuration.png"/>
 
 ## Preparação do ambiente
