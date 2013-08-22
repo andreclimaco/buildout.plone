@@ -56,7 +56,7 @@ $ cd /path/to/zeo
 $ python bootstrap.py
 $ bin/buildout -v
 ```
-## Zope Instances - ZEO-Clients
+## ZEO-Clients - Instances
 Preparando as configurações antes de rodar o buildout:
 ```bash
 $ cd /path/to/app
