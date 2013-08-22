@@ -4,7 +4,7 @@
 
 ## Preparação do ambiente
 
-Monte seu ambiente python utilizando o ``<a href="http://raw.github.com/collective/buildout.python">buildout.python</a>`` disponibilizado no repositório collective.
+Monte seu ambiente python utilizando o [buildout.python](http://github.com/collective/buildout.python) disponibilizado no repositório collective.
 
 ## Zeo
 
