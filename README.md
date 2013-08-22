@@ -35,7 +35,7 @@ Utilizando o pacote [buildout.python](http://github.com/collective/buildout.pyth
 ```bash
 $ source /path/to/env/bin/activate
 ```
-## ZEO
+## ZEO-Server
 Preparando as configurações antes de rodar o buildout:
 ```bash
 $ cd /path/to/zeo
@@ -56,7 +56,7 @@ $ cd /path/to/zeo
 $ python bootstrap.py
 $ bin/buildout -v
 ```
-## Zope Instances
+## Zope Instances - ZEO-Clients
 Preparando as configurações antes de rodar o buildout:
 ```bash
 $ cd /path/to/app
