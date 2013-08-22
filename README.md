@@ -147,6 +147,12 @@ Sponsored by
 
 Referências:
 
-http://www.asconix.com/howtos/plone-cms/high-performance-plone-setup-howto
-https://github.com/sebasgo/sbo-dresden.de
-
+* nginx.org
+* www.varnish-cache.org
+* haproxy.1wt.eu
+* plone.org
+* www.zope.org
+* www.asconix.com/howtos/plone-cms/high-performance-plone-setup-howto
+* github.com/collective/buildout.python
+* github.com/intranett/intranett
+* github.com/sebasgo/sbo-dresden.de
