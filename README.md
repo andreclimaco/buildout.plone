@@ -15,17 +15,51 @@ Utilizando o pacote [buildout.python](http://github.com/collective/buildout.pyth
 $ source /path/to/env/bin/activate
 ```
 ## ZEO
+Preparando as configurações antes de rodar o buildout:
 ```bash
-$ cd /path/to/zodb
+$ cd /path/to/zeo
+$ vim settings.cfg
+
+No arquivo alterar as variáveis:
+
+[blobstorage]
+directory = /path/to/blobstorage
+
+[tmp]
+directory = /path/to/tmpPortal
+```
+Executar o buildout:
+
+```bash
+$ cd /path/to/zeo
 $ python bootstrap.py
 $ bin/buildout -v
 ```
 ## Zope Instances
+Preparando as configurações antes de rodar o buildout:
+```bash
+$ cd /path/to/app
+$ vim settings.cfg
+
+No arquivo alterar as variáveis:
+
+[users]
+effective-user = user/local/machine
+
+[blobstorage]
+directory = /path/to/blobstorage
+
+[tmp]
+directory = /path/to/tmpPortal
+```
+Executar o buildout:
+
 ```bash
 $ cd /path/to/app
 $ python bootstrap.py
 $ bin/buildout -v
 ```
+
 ## Frontend
 ```bash
 $ cd /path/to/frontend
