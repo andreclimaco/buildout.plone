@@ -147,12 +147,12 @@ Sponsored by
 
 Referências:
 
-* nginx.org
-* www.varnish-cache.org
-* haproxy.1wt.eu
-* plone.org
-* www.zope.org
-* www.asconix.com/howtos/plone-cms/high-performance-plone-setup-howto
-* github.com/collective/buildout.python
-* github.com/intranett/intranett
-* github.com/sebasgo/sbo-dresden.de
+* http://nginx.org
+* http://www.varnish-cache.org
+* http://haproxy.1wt.eu
+* http://plone.org
+* http://www.zope.org
+* http://www.asconix.com/howtos/plone-cms/high-performance-plone-setup-howto
+* http://github.com/collective/buildout.python
+* http://github.com/intranett/intranett
+* http://github.com/sebasgo/sbo-dresden.de
