@@ -144,3 +144,9 @@ André Clímaco
 Sponsored by 
 
 [<img src="http://lucasaquino.com.br/logo.png" width="200"  />](http://www.lucasaquino.com.br)
+
+Referências:
+
+http://www.asconix.com/howtos/plone-cms/high-performance-plone-setup-howto
+https://github.com/sebasgo/sbo-dresden.de
+
