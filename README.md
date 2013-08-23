@@ -132,9 +132,12 @@ $ ./bin/supervisorctl status
 
 ```
 
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=YOUTUBE_VIDEO_ID_HERE
-" target="_blank"><img src="http://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg" 
-alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
+[HowTo - Setting Plone infrastructure using buildout](http://www.youtube.com/watch?v=nF_2xJyBsXU)
+
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=nF_2xJyBsXU
+" target="_blank"><img src="http://img.youtube.com/vi/nF_2xJyBsXU/0.jpg" 
+alt="HowTo - Setting Plone infrastructure using buildout"  border="10" /></a>
 
 
 Powered:
