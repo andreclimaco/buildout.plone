@@ -142,11 +142,11 @@ alt="HowTo - Setting Plone infrastructure using buildout"  border="10" /></a>
 
 Powered:
 
-André Clímaco
+<img src="https://raw.github.com/andreclimaco/buildout.plone/master/docs/andreclimaco.png" width="250"  />
 
 Sponsored by 
 
-[<img src="http://lucasaquino.com.br/logo.png" width="200"  />](http://www.lucasaquino.com.br)
+[<img src="http://lucasaquino.com.br/logo.png" width="250"  />](http://www.lucasaquino.com.br)
 
 Referências:
 
