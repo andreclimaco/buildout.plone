@@ -35,9 +35,6 @@ sub vcl_recv {
         set req.url = "/";
     }
 
-    # Set backend
-    #set req.backend = portal;
-
     # Clean req.url
     call normalize_url;
 
