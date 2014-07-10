@@ -1,0 +1,26 @@
+server {
+    listen       80;
+    server_name VAR_PORTAL_URL;
+
+    #Define root to this webserver
+    root  ../../var/www/VAR_PORTAL_ID/mirror;
+
+    access_log ../../var/log/access.VAR_PORTAL_ID.log main;
+
+    # Get content from Varnish
+    location @fetch {
+        internal;
+        proxy_pass http://varnish;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Host $http_host;
+        proxy_pass_header Set-Cookie;
+        proxy_store on;
+        proxy_store_access user:rw  group:rw  all:r;
+        proxy_temp_path ../../var/www/VAR_PORTAL_ID/tmp;
+    }
+
+    # Inclui rotinas comuns a todos os sites
+   #INCLUDE_LOGIN include ${buildout:directory}/etc/vhosts/includes/login.conf;
+   #INCLUDE_COMUM include ${buildout:directory}/etc/vhosts/includes/comum.conf;
+    
+}

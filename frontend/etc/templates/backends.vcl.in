@@ -1,0 +1,31 @@
+probe zope_healthcheck { 
+    .url = "/haproxy-ping";
+    .interval = 2s;
+    .timeout = 400ms;
+    .window = 10;
+    .threshold = 7;
+}
+
+backend haproxy_authenticated {
+    .host = "${hosts:haproxy}";
+    .port = "${ports:haproxy-auth}";
+    .connect_timeout = 1s;
+    .first_byte_timeout = 120s;
+    .probe = zope_healthcheck;
+}
+
+backend haproxy_anon {
+    .host = "${hosts:haproxy}";
+    .port = "${ports:haproxy-anon}";
+    .connect_timeout = 1s;
+    .first_byte_timeout = 120s;
+    .probe = zope_healthcheck;
+}
+
+backend haproxy_searchbots {
+    .host = "${hosts:haproxy}";
+    .port = "${ports:haproxy-bots}";
+    .connect_timeout = 1s;
+    .first_byte_timeout = 120s;
+    .probe = zope_healthcheck;
+}

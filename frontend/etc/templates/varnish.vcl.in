@@ -1,13 +1,11 @@
-include "${buildout:directory}/etc/varnish/vhosts.vcl";
+# Include list of backends and portal
+include "${buildout:directory}/etc/varnish/includes/backends.vcl";
 
-backend default {
-    .host = "${varnish-config:backend-host}";
-    .port = "${varnish-config:backend-port}";
-    .connect_timeout = 0.4s;
-    .first_byte_timeout = 300s;
-    .between_bytes_timeout = 60s;
-}
+# Include vhosts
+include "${buildout:directory}/etc/varnish/includes/vhosts.vcl";
 
+# Include device detect
+include "${buildout:directory}/etc/varnish/includes/devicedetect.vcl";
 
 acl purge {
     "localhost";
@@ -15,16 +13,15 @@ acl purge {
     ${varnish-config:purge-hosts}
 }
 
-
 sub vcl_recv {
    # Allow a grace period for offering "stale" data in case backend lags
    # https://www.varnish-cache.org/docs/3.0/tutorial/handling_misbehaving_servers.html#misbehaving-servers
     if (!req.backend.healthy) {
-        set req.grace = 5m;
+        set req.grace = 3600s;
     } else {
         set req.grace = 120s;
     }
-   
+
     # Hotfix to fix CVE 2011-3587 for Zope 2.12 + 2.13: Products.Zope_Hotfix_CVE_2011_3587
     if (req.url ~ "/p_/webdav/?(.*)"){
         set req.url = "/";
@@ -35,18 +32,32 @@ sub vcl_recv {
         set req.url = "/";
     }
 
+    # Set backend
+    set req.backend = haproxy_anon;
+
     # Clean req.url
     call normalize_url;
 
+    # Normalize Accept-Encoding header
+    call normalize_encoding;
+
+    # Call normalize_user_agent
+    call devicedetect;
+
     # Multiple hostnames
     call process_vhosts;
+
+    # Bots will be handled by specific backends
+    if (req.http.X-UA-Device == "bot") {
+        set req.backend = haproxy_searchbots;
+    }
 
     # Deal with PURGES and BANS
     if (req.request == "PURGE") {
         if (!client.ip ~ purge) {
             error 405 "Not allowed.";
         }
-        ban_url(req.url);
+        ban("req.url == " + req.url);
         error 200 "Purged.";
     }
 
@@ -62,12 +73,6 @@ sub vcl_recv {
         error 200 "Ban added";
     }
 
-    # Normalize Accept-Encoding header
-    call normalize_encoding;
- 
-    # Call normalize_user_agent
-    call normalize_user_agent;
-    
     if (req.restarts == 0) {
         if (req.http.x-forwarded-for) {
             set req.http.X-Forwarded-For =
@@ -92,7 +97,7 @@ sub vcl_recv {
         # Force a cache miss
         set req.hash_always_miss = true;
     }
-    
+
     if (req.request != "GET" &&
         req.request != "HEAD" &&
         req.request != "PUT" &&
@@ -111,27 +116,28 @@ sub vcl_recv {
     if (req.request != "GET" && req.request != "HEAD") {
         # POST - Logins and edits
         if (req.request == "POST") {
-            #set req.backend = adm;
+            set req.backend = haproxy_authenticated;
             return(pass);
-        }
-        if (req.url ~ "^/.*/resolveuid/?"){
-            remove req.http.cookie;
-            return(lookup);
         }
         return(pass);
     }
-    
+
+    if (req.url ~ "^/.*/resolveuid/?"){
+        remove req.http.cookie;
+        return(lookup);
+    }
+
     if (req.url ~ "^/(portal_javascripts|portal_css|portal_kss)/") {
         remove req.http.cookie;
         return(lookup);
     }
-  
+
     if (req.url ~ "^/[^-]*\-cachekey[^.]*\.(css|kss|js|json)$") {
         remove req.http.cookie;
         return(lookup);
     }
 
-    if (req.request == "GET" && req.url ~ "\.(png|gif|jpg|swf|flv|css|js|ico|pdf|htc|kss|bmp|json)$") {
+    if (req.request == "GET" && req.url ~ "\.(png|gif|jpg|jpeg|swf|flv|css|js|ico|pdf|htc|kss|bmp|json)$") {
         # Keep static files out of memory
         remove req.http.cookie;
         return(lookup);
@@ -158,7 +164,7 @@ sub vcl_recv {
 
     /* We only care about the "__ac.*" cookies, used for authentication */
     if (req.http.Cookie && (req.http.Cookie ~ "__ac(_(name|password|persistent))?=" || req.http.Cookie ~ "_ZopeId")) {
-        #set req.backend = adm;
+        set req.backend = haproxy_authenticated;
         return(pass);
     }
 
@@ -209,7 +215,7 @@ sub vcl_miss {
 
 sub vcl_fetch {
     set beresp.do_esi = true;
-    set beresp.grace = 120s;
+    set beresp.grace = 3600s;
 
     if (beresp.ttl < 7200s) {
         set beresp.ttl = 7200s;
@@ -218,7 +224,7 @@ sub vcl_fetch {
     # Cache de erros 404
     if (beresp.status == 404 || req.url ~ "\/404/?$") {
         unset beresp.http.set-cookie;
-        set beresp.http.X-Varnish-PORTAL = "404 error";
+        set beresp.http.X-Varnish-Portal = "404 error";
         set beresp.ttl = 7d;
     } 
 
@@ -235,7 +241,7 @@ sub vcl_fetch {
 
     if (req.url ~ "^/(portal_javascripts|portal_css|portal_kss)/"){
         unset beresp.http.set-cookie;
-        set beresp.http.X-Varnish-PORTAL = "resources";
+        set beresp.http.X-Varnish-Portal = "resources";
         if (!beresp.http.cache-control){
             set beresp.http.cache-control = "max-age = 36000";
             set beresp.ttl = 36000s;
@@ -244,7 +250,7 @@ sub vcl_fetch {
 
     if (req.url ~ "\.(png|gif|jpg|swf|flv|ico|pdf|htc|bmp)$") {
         unset beresp.http.set-cookie;
-        set beresp.http.X-Varnish-PORTAL = "resources";
+        set beresp.http.X-Varnish-Portal = "resources";
         if (!beresp.http.cache-control){
             set beresp.http.cache-control = "max-age = 36000";
             set beresp.ttl = 36000s;
@@ -253,11 +259,10 @@ sub vcl_fetch {
 
     if (req.url ~ "\.(css|kss|js|json)$") {
         unset beresp.http.set-cookie;
-        set beresp.http.X-Varnish-PORTAL = "static resources";
+        set beresp.http.X-Varnish-Portal = "static resources";
         set beresp.http.cache-control = "max-age = 31536000";
         set beresp.ttl = 31536000s;
     }
-
 
     if (req.url ~ "^/[^-]*\-cachekey[^.]*\.(css|kss|js|json)$") {
         unset beresp.http.set-cookie;
@@ -268,7 +273,7 @@ sub vcl_fetch {
 
     if (req.request == "GET" && req.url ~ "\.(tiff|tif|svg|vsd|doc|ppt|pps|xls|mp3|mp4|m4a|ogg|mov|avi|wmv|sxw|zip|gz|bz2|tgz|tar|rar|odc|odb|odf|odg|odi|odp|ods|odt|sxc|sxd|sxi|sxw|dmg|torrent|deb|msi|iso|rpm|pot|rtf|csv|asc|cst|emf|dot)$") {
         unset beresp.http.set-cookie;
-        set beresp.http.X-Varnish-PORTAL = "Files";
+        set beresp.http.X-Varnish-Portal = "Files";
         if (!beresp.http.cache-control){
             set beresp.http.cache-control = "max-age = 36000";
             set beresp.ttl = 36000s;
@@ -285,7 +290,7 @@ sub vcl_fetch {
 
     # Força o cache de imagens de conteudo geradas pelo plone ou plone.app.imaging
     if (req.url ~ "\/image_?(.*)?$") {
-        set beresp.http.X-Varnish-PORTAL = "imagem_conteudo";
+        set beresp.http.X-Varnish-Portal = "imagem_conteudo";
         unset beresp.http.set-cookie;
     }
 
@@ -293,7 +298,7 @@ sub vcl_fetch {
     call robots_validation;
 
     if (req.url ~ "^/.*/resolveuid/?"){
-        set beresp.http.X-Varnish-PORTAL = "ResolveUID";
+        set beresp.http.X-Varnish-Portal = "ResolveUID";
         unset beresp.http.set-cookie;
         if (!beresp.http.cache-control){
             set beresp.http.cache-control = "max-age = 36000";
@@ -302,7 +307,7 @@ sub vcl_fetch {
     }
 
     if (req.url ~ "(rss_|search_rss|RSS|atom\.xml)") {
-        set beresp.http.X-Varnish-PORTAL = "feed";
+        set beresp.http.X-Varnish-Portal = "feed";
         unset beresp.http.set-cookie;
         set beresp.ttl = 1800s;
     }
@@ -462,25 +467,9 @@ sub normalize_encoding {
     }
 }
 
-sub normalize_user_agent {
-    if (req.http.user-agent ~ "MSIE" || req.http.user-agent ~ "Firefox" || req.http.user-agent ~ "Mozilla" || req.http.user-agent ~ "Safari" || req.http.user-agent ~ "Opera") {
-        set req.http.X-UA = "pc";
-    } elseif (req.http.User-Agent ~ "iPad" ) {
-        # It says its a iPad - so let's give them the tablet-site
-        set req.http.X-UA = "mobile-tablet";
-    } elseif (req.http.User-Agent ~ "iP(hone|od)" || req.http.User-Agent ~ "Android") {
-        set req.http.X-UA = "mobile-smart";
-    } elseif (req.http.user-agent ~ "Opera Mini/" || req.http.user-agent ~ "Opera Mobi/" || req.http.User-Agent ~ "SymbianOS" || req.http.User-Agent ~ "^BlackBerry" || req.http.User-Agent ~ "^SonyEricsson" || req.http.User-Agent ~ "^Nokia" || req.http.User-Agent ~ "^SAMSUNG" || req.http.User-Agent ~ "^LG") {
-        set req.http.X-UA = "mobile-other";
-    } else {
-        set req.http.X-UA = "nomatch";
-    }
-}
-
 sub robots_validation {
     /* Don't display a cache link or snippet for this item in the Google search results and don't include this document in the Google search results */
     if (req.url ~ "\/(search|login|logged|cloud|sendto|folder|sitemap)(_)?(form|factories|rss)?$"){
        set beresp.http.X-Robots-Tag = "noindex,noarchive,nosnippet,nofollow";
     }
-
 }
