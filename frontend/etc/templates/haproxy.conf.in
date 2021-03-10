@@ -36,7 +36,7 @@ frontend searchbots
     default_backend bots_backends
 
 backend auth_backends
-    appsession __ac len 32 timeout 1d
+#    appsession __ac len 32 timeout 1d
     balance leastconn
     option httpchk GET /index_html
     ${haproxy-conf:auth-backends}
@@ -51,7 +51,8 @@ backend bots_backends
     option httpchk GET /index_html
     ${haproxy-conf:bots-backends}
 
-listen stats ${hosts:haproxy}:${ports:haproxy-status}
+listen stats 
+    bind ${hosts:haproxy}:${ports:haproxy-status}
     mode http
     stats enable
     stats refresh 5s
